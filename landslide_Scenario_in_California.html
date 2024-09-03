@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Landslide Scenario</title>
+    <style>
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        #header {
+            width: 100%;
+            background-color: rgb(150, 75, 0);
+            height: 10%;
+            text-align: center;
+            color: white;
+            margin: 0;
+            padding: 0;
+        }
+
+        #container {
+            display: flex;
+            width: 100%;
+            height: 90%;
+            justify-content: flex-start;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .legendDiv {
+            flex: 0.2;
+            height: 100%;
+            padding: 5px;
+            border: 1px solid rgb(0, 0, 0);
+            background-color: black;
+            margin-top: 0;
+        }
+
+        .viewDiv,
+        .viewDiv2,
+        .viewDiv3 {
+            flex: 0.6;
+            height: 100%;
+            padding: 5px;
+            border: 1px solid rgb(0, 0, 0);
+            background-color: black;
+            margin-top: 0;
+        }
+
+        #legendview {
+            height: 100%;
+        }
+
+        .title {
+            float: left;
+            height: 34px;
+            width: 100%;
+            background-color: black;
+            color: white;
+            text-align: center;
+            padding-right: 0.5%;
+            font-weight: 400;
+            font-size: 22px;
+            margin: 0;
+        }
+
+        .mapContainer {
+            height: calc(100% - 34px);
+            width: 100%;
+            position: relative;
+        }
+    </style>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.28/esri/themes/light/main.css">
+    <script src="https://js.arcgis.com/4.28/"></script>
+
+    <script>
+        require([
+            "esri/Map",
+            "esri/views/MapView",
+            "esri/layers/CSVLayer",
+            "esri/layers/ImageryLayer",
+            "esri/widgets/LayerList",
+            "esri/layers/GeoJSONLayer",
+            "esri/widgets/ScaleBar"
+        ], function (Map, MapView, CSVLayer, ImageryLayer, LayerList, GeoJSONLayer, ScaleBar) {
+            var map = new Map({
+                basemap: "dark-gray"
+            });
+
+            var view1 = new MapView({
+                container: "viewDiv",
+                map: map,
+                zoom: 5,
+                center: [-119.80454, 37]
+            });
+
+            var view2 = new MapView({
+                container: "viewDiv2",
+                map: new Map({
+                    basemap: "dark-gray"
+                }),
+                zoom: 5,
+                center: [-119.80454, 37]
+            });
+
+            var view3 = new MapView({
+                container: "viewDiv3",
+                map: new Map({
+                    basemap: "dark-gray"
+                }),
+                zoom: 5,
+                center: [-119.80454, 37]
+            });
+
+            var url = "https://dl.dropbox.com/scl/fi/w63p7ko3rjfvgqwv9z71n/Buffer.geojson?rlkey=w4rb7jtymhb53e57knw8xgj52&dl=0";
+            var roadLayer = new GeoJSONLayer({
+                url: url,
+                title: "Areas_within_10_km_of_major_roads"
+            });
+            var border3 = new GeoJSONLayer({
+                url: "https://dl.dropbox.com/scl/fi/zcgq63oi393qkx90glldv/boundary.json?rlkey=7gi1vy333jk8p0vjx73v83gj8&dl=0",
+                title: "California Border",
+                renderer: {
+                    type: "simple",
+                    symbol: {
+                        type: "simple-line",
+                        color: "White",
+                        width: 0.5,
+
+                    }
+                }
+            });
+            var roads = new GeoJSONLayer({
+                url: "https://dl.dropbox.com/scl/fi/dcihv4pdlnlsxtdp9eo1h/roads.json?rlkey=fwmkxtzoyx9y4nh2x61ylsoud&dl=0",
+                title: "Major Roads",
+                renderer: {
+                    type: "simple",
+                    symbol: {
+                        type: "simple-line",
+                        color: "pink",
+                        width: 1,
+
+                    }
+                }
+            });
+            const scaleBar = new ScaleBar({
+                view: view3
+            })
+
+            view3.ui.add(scaleBar, { position: "bottom-left" });
+            view3.map.add(roads);
+            view3.map.add(roadLayer);
+            view3.map.add(border3);
+
+
+
+
+
+            const landRenderer = {
+                type: "unique-value",
+                legendOptions: {
+                    title: "Landslide category"
+                },
+                field: "landslide_size",
+                uniqueValueInfos: [{
+                    value: "small",
+                    symbol: {
+                        type: "simple-marker",
+                        style: "circle",
+                        color: "orange",
+                        size: "8px",
+                        outline: {
+                            color: [0, 0, 0],
+                            width: 1
+                        }
+                    },
+                    label: "small"
+                },
+                {
+                    value: "medium",
+                    symbol: {
+                        type: "simple-marker",
+                        style: "circle",
+                        color: "DodgerBlue",
+                        size: "8px",
+                        outline: {
+                            color: [0, 0, 0],
+                            width: 1
+                        }
+                    },
+                    label: "medium"
+                },
+                {
+                    value: "large",
+                    symbol: {
+                        type: "simple-marker",
+                        style: "circle",
+                        color: "Yellow",
+                        size: "8px",
+                        outline: {
+                            color: [0, 0, 0],
+                            width: 1
+                        }
+                    },
+                    label: "large"
+                },
+                {
+                    value: "very_large",
+                    symbol: {
+                        type: "simple-marker",
+                        style: "circle",
+                        color: "purple",
+                        size: "8px",
+                        outline: {
+                            color: [0, 0, 0],
+                            width: 1
+                        }
+                    },
+                    label: "very large"
+                },
+                {
+                    value: "catastrophic",
+                    symbol: {
+                        type: "simple-marker",
+                        style: "circle",
+                        color: "red",
+                        size: "8px",
+                        outline: {
+                            color: [0, 0, 0],
+                            width: 1
+                        }
+                    },
+                    label: "catastrophic"
+                },
+                {
+                    value: "unknown",
+                    symbol: {
+                        type: "simple-marker",
+                        style: "circle",
+                        color: "White",
+                        size: "8px",
+                        outline: {
+                            color: [0, 0, 0],
+                            width: .3
+                        }
+                    },
+                    label: "unknown"
+                }
+                ]
+            };
+
+            var url1 = "https://dl.dropbox.com/scl/fi/sn9imjc9pbcdrbstcfdeu/Landslides.csv?rlkey=saczi9j2ez6okt30bhada3gqh&dl=0";
+
+            var template = {
+                title: "Landslide Info",
+                content: [{
+                    type: "fields",
+                    fieldInfos: [{
+                        fieldName: "event_title",
+                        label: "Event Title",
+                    },
+                    {
+                        fieldName: "event_date",
+                        label: "Event Date",
+                    },
+                    {
+                        fieldName: "landslide_category",
+                        label: "Landslide Category",
+                    },
+                    {
+                        fieldName: "landslide_trigger",
+                        label: "Landslide Trigger",
+                    },
+                    {
+                        fieldName: "landslide_size",
+                        label: "Landslide Size",
+                    },
+                    {
+                        fieldName: "gazetteer_closest_point",
+                        label: "Closest Point",
+                    },
+                    {
+                        fieldName: "photo_link",
+                        label: "Photo Link"
+                    },
+                    {
+                        fieldName: "event_description",
+                        label: "Event Description",
+                    }
+                    ]
+                }]
+            };
+
+            var landslidesLayer = new CSVLayer({
+                url: url1,
+                copyright: "NASA",
+                popupTemplate: template,
+                renderer: landRenderer
+            });
+            var border2 = new GeoJSONLayer({
+                url: "https://dl.dropbox.com/scl/fi/zcgq63oi393qkx90glldv/boundary.json?rlkey=7gi1vy333jk8p0vjx73v83gj8&dl=0",
+                title: "California Border",
+                renderer: {
+                    type: "simple",
+                    symbol: {
+                        type: "simple-line",
+                        color: "white",
+                        width: 0.5,
+
+                    }
+                }
+            });
+            const scaleBar1 = new ScaleBar({
+                view: view1
+            })
+
+            view1.ui.add(scaleBar1, { position: "bottom-left" });
+
+            view1.map.add(landslidesLayer);
+            view1.map.add(border2);
+
+            var precipLayer = new ImageryLayer({
+                url: "https://apps.fs.usda.gov/fsgisx01/rest/services/RDW_Climate/AvgAnnualPrecipHistorical1975_2005_CONUS/ImageServer",
+                copyright: "usda.gov",
+            });
+            var border1 = new GeoJSONLayer({
+                url: "https://dl.dropbox.com/scl/fi/zcgq63oi393qkx90glldv/boundary.json?rlkey=7gi1vy333jk8p0vjx73v83gj8&dl=0",
+                title: "California Border",
+                renderer: {
+                    type: "simple",
+                    symbol: {
+                        type: "simple-line",
+                        color: "white",
+                        width: 0.5,
+
+                    }
+                }
+            });
+            const scaleBar3 = new ScaleBar({
+                view: view2
+            })
+
+            view2.ui.add(scaleBar3, { position: "bottom-left" });
+
+            view2.map.add(precipLayer);
+            view2.map.add(border1)
+
+            const views = [view1, view2, view3];
+            let active;
+
+            const sync = (source) => {
+                if (!active || !active.viewpoint || active !== source) {
+                    return;
+                }
+
+                for (const view of views) {
+                    if (view !== active) {
+                        view.viewpoint = active.viewpoint;
+                    }
+                }
+            };
+
+            for (const view of views) {
+                view.watch(["interacting", "animation"], () => {
+                    active = view;
+                    sync(active);
+                });
+
+                view.watch("viewpoint", () => sync(view));
+            }
+
+            var layerlist1 = new LayerList({
+                container: "legendview",
+                view: view1,
+                listItemCreatedFunction: function (event) {
+                    const item = event.item;
+                    if (item.layer.type !== "group") {
+                        item.panel = {
+                            content: "legend",
+                            open: true
+                        };
+                    }
+                }
+            });
+
+            var layerlist2 = new LayerList({
+                container: "legendview",
+                view: view2,
+                listItemCreatedFunction: function (event) {
+                    const item = event.item;
+                    if (item.layer.type !== "group") {
+                        item.panel = {
+                            content: "legend",
+                            open: true
+                        };
+                    }
+                }
+            });
+
+            var layerlist3 = new LayerList({
+                container: "legendview",
+                view: view3,
+                listItemCreatedFunction: function (event) {
+                    const item = event.item;
+                    if (item.layer.type !== "group") {
+                        item.panel = {
+                            content: "legend",
+                            open: true
+                        };
+                    }
+                }
+            });
+
+        });
+    </script>
+</head>
+
+<body>
+
+    <div id="header">
+        <h1>Climatic and Anthropogenic Factors of Landslides in California, USA</h1>
+    </div>
+
+    <div id="container">
+        <div class="legendDiv">
+            <div id="legendview"></div>
+        </div>
+        <div class="viewDiv">
+            <div class="title">Landlsides from 1926 to 2020</div>
+            <div class="mapContainer" id="viewDiv"></div>
+        </div>
+        <div class="viewDiv2">
+            <div class="title">Precipitation</div>
+            <div class="mapContainer" id="viewDiv2"></div>
+        </div>
+        <div class="viewDiv3">
+            <div class="title">10 km Areas Within Major Roads</div>
+            <div class="mapContainer" id="viewDiv3"></div>
+        </div>
+    </div>
+
+</body>
+
+</html>
